@@ -26,16 +26,16 @@ LIBS = -lm -lgraphics
 LFLAGS = -L$(LIBDIR) -L/opt/local/lib
 
 # put all of the relevant include files here
-_DEPS = ppmIO.h image.h graphics.h
+_DEPS = ppmIO.h image.h graphics.h polygon.h
 
 # convert them to point to the right place
 DEPS = $(patsubst %,$(INCDIR)/%,$(_DEPS))
 
 # put a list of the executables here
-EXECUTABLES = testbench test3d test3a test3b test3c test3a_flood_fill test3b_flood_fill test3e 3d_box
+EXECUTABLES = test4a test4b test4c test4c-loop
 
 # put a list of all the object files here for all executables (with .o endings)
-_OBJ = testbench.o test3d.o test3a.o test3b.o test3c.o test3a_flood_fill.o test3b_flood_fill.o test3e.o 3d_box.o
+_OBJ = test4a.o test4b.o test4c.o test4c-loop.o
 
 # convert them to point to the right place
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
@@ -57,23 +57,13 @@ all:
 
 
 # put the specific executable rules here
-testbench: $(ODIR)/testbench.o
+test4a: $(ODIR)/test4a.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-test3d: $(ODIR)/test3d.o
+test4b: $(ODIR)/test4b.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-test3a: $(ODIR)/test3a.o
+test4c: $(ODIR)/test4c.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-test3b: $(ODIR)/test3b.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-test3c: $(ODIR)/test3c.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-test3a_flood_fill: $(ODIR)/test3a_flood_fill.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-test3b_flood_fill: $(ODIR)/test3b_flood_fill.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-test3e: $(ODIR)/test3e.o
-	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
-3d_box: $(ODIR)/3d_box.o
+test4c-loop: $(ODIR)/test4c-loop.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
 .PHONY: clean
