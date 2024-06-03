@@ -4,6 +4,7 @@
 #include "point.h"
 #include "line.h"
 #include "image.h"
+#include "polygon.h"
 #include <stdio.h>
 
 /**

@@ -1,5 +1,6 @@
 #include "../include/polygon.h"
 #include "../include/line.h"
+#include <math.h>
 #include <stdlib.h>
 
 void *polygon_create() {

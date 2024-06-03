@@ -71,6 +71,8 @@ static Edge *makeEdgeRec(Point start, Point end, Image *src) {
     printf("Unable to allocate memory for an edge.\n");
     return NULL;
   }
+  // printf("Edge: (%f, %f) -> (%f, %f)\n", start.val[0], start.val[1],
+  //        end.val[0], end.val[1]);
 
   // Initialize the edge structure with start and end points
   edge->x0 = start.val[0];
@@ -81,6 +83,7 @@ static Edge *makeEdgeRec(Point start, Point end, Image *src) {
   // Clip the edge if it starts below the image or ends above the image
   if (edge->y1 < 0 || edge->y0 >= src->rows) {
     free(edge);
+    // printf("Edge is outside the image. 84\n");
     return NULL;
   }
 
@@ -98,6 +101,7 @@ static Edge *makeEdgeRec(Point start, Point end, Image *src) {
   // Check if the edge should be included based on its position relative to the
   // image
   if (edge->yStart >= src->rows || edge->yEnd < 0) {
+    // printf("Edge is outside the image. 102\n");
     free(edge);
     return NULL;
   }
@@ -119,9 +123,10 @@ static Edge *makeEdgeRec(Point start, Point end, Image *src) {
 
   // Check for steep slopes that might cause xIntersect to go beyond the edge's
   // x1
-  if ((edge->dxPerScan > 0 && edge->xIntersect > edge->x1) ||
-      (edge->dxPerScan < 0 && edge->xIntersect < edge->x0)) {
+  if ((edge->dxPerScan > 0 && edge->xIntersect > fmaxf(edge->x0, edge->x1)) ||
+      (edge->dxPerScan < 0 && edge->xIntersect < fminf(edge->x0, edge->x1))) {
     free(edge);
+    // printf("Steep edge 127\n");
     return NULL;
   }
 
@@ -149,10 +154,13 @@ static LinkedList *setupEdgeList(Polygon *p, Image *src) {
     // the current point (i) is the end of the segment
     v2 = p->vertex[i];
 
+    // printf("Segment: (%f, %f) -> (%f, %f)\n", v1.val[0], v1.val[1], v2.val[0],
+    //        v2.val[1]);
     // if it is not a horizontal line
     if ((int)(v1.val[1] + 0.5) != (int)(v2.val[1] + 0.5)) {
       Edge *edge;
-
+      // printf("Segment: (%f, %f) -> (%f, %f)\n", v1.val[0], v1.val[1],
+      //        v2.val[0], v2.val[1]);
       // if the first coordinate is smaller (top edge)
       if (v1.val[1] < v2.val[1])
         edge = makeEdgeRec(v1, v2, src);
@@ -160,8 +168,11 @@ static LinkedList *setupEdgeList(Polygon *p, Image *src) {
         edge = makeEdgeRec(v2, v1, src);
 
       // insert the edge into the list of edges if it's not null
-      if (edge)
+      if (edge) {
         ll_insert(edges, edge, compYStart);
+        // printf("Edge: (%f, %f) -> (%f, %f)\n", edge->x0, edge->y0, edge->x1,
+        //        edge->y1);
+      }
     }
     v1 = v2;
   }
