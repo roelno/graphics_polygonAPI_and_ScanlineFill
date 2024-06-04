@@ -154,7 +154,8 @@ static LinkedList *setupEdgeList(Polygon *p, Image *src) {
     // the current point (i) is the end of the segment
     v2 = p->vertex[i];
 
-    // printf("Segment: (%f, %f) -> (%f, %f)\n", v1.val[0], v1.val[1], v2.val[0],
+    // printf("Segment: (%f, %f) -> (%f, %f)\n", v1.val[0], v1.val[1],
+    // v2.val[0],
     //        v2.val[1]);
     // if it is not a horizontal line
     if ((int)(v1.val[1] + 0.5) != (int)(v2.val[1] + 0.5)) {

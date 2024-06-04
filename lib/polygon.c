@@ -138,28 +138,15 @@ void polygon_draw(Polygon *p, Image *src, Color c) {
   line_draw(&l, src, c);
 }
 
-/**
- * @brief Calculates the Barycentric coordinates for a point with respect to a
- * triangle.
- * @param x X-coordinate of the point.
- * @param y Y-coordinate of the point.
- * @param x1, y1, x2, y2, x3, y3 Coordinates of the triangle's vertices.
- * @returns Array of three floats representing the Barycentric coordinates.
- */
-static float *getBarycentric(float x, float y, float x1, float y1, float x2,
-                             float y2, float x3, float y3) {
-  float *bary = (float *)malloc(3 * sizeof(float));
-  float detT = (y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3);
-  bary[0] = ((y2 - y3) * (x - x3) + (x3 - x2) * (y - y3)) / detT;
-  bary[1] = ((y3 - y1) * (x - x3) + (x1 - x3) * (y - y3)) / detT;
-  bary[2] = 1.0f - bary[0] - bary[1];
-  return bary;
-}
-
 void polygon_drawFillB(Polygon *p, Image *src, Color c) {
-  // Find bounding box of the polygon
+  if (p->nVertex != 3)
+    return; // Ensure there are 3 vertices to form a triangle
+
+  // Initialize bounding box values
   float minX = p->vertex[0].val[0], maxX = minX;
   float minY = p->vertex[0].val[1], maxY = minY;
+
+  // Find the bounding box of the polygon
   for (int i = 1; i < p->nVertex; i++) {
     float vx = p->vertex[i].val[0], vy = p->vertex[i].val[1];
     if (vx < minX)
@@ -172,25 +159,43 @@ void polygon_drawFillB(Polygon *p, Image *src, Color c) {
       maxY = vy;
   }
 
-  // Iterate over each pixel in the bounding box
-  for (int y = (int)ceil(minY); y <= (int)floor(maxY); y++) {
-    for (int x = (int)ceil(minX); x <= (int)floor(maxX); x++) {
-      // Assume the polygon is a triangle for simplicity
-      float *bary = getBarycentric(
-          x + 0.5, y + 0.5, // Use the center of the pixel
-          p->vertex[0].val[0], p->vertex[0].val[1], p->vertex[1].val[0],
-          p->vertex[1].val[1], p->vertex[2].val[0], p->vertex[2].val[1]);
+  // Define vertices A, B, C
+  float x1 = p->vertex[0].val[0], y1 = p->vertex[0].val[1];
+  float x2 = p->vertex[1].val[0], y2 = p->vertex[1].val[1];
+  float x3 = p->vertex[2].val[0], y3 = p->vertex[2].val[1];
+  // printf("x1: %f, y1: %f, x2: %f, y2: %f, x3: %f, y3: %f\n", x1, y1, x2, y2,
+  // x3, y3);
 
-      // Check if point (x, y) is inside the triangle
-      if (bary[0] >= 0 && bary[1] >= 0 && bary[2] >= 0) {
-        if (x >= 0 && x < src->cols && y >= 0 && y < src->rows) {
-          src->data[y][x].rgb[0] = c.c[0];
-          src->data[y][x].rgb[1] = c.c[1];
-          src->data[y][x].rgb[2] = c.c[2];
-          src->data[y][x].a = 1.0; // Assuming full opacity
-        }
+  // Denominators for beta and gamma
+  float f_ca_beta = (y3 - y1) * x2 + (x1 - x3) * y2 + x3 * y1 - x1 * y3;
+  float f_ab_gamma = (y1 - y2) * x3 + (x2 - x1) * y3 + x1 * y2 - x2 * y1;
+
+  // Check if denominators are zero to avoid division by zero
+  if (f_ca_beta == 0 || f_ab_gamma == 0)
+    return; // Degenerate triangle (collinear vertices)
+
+  // Scan over bounding box and check each pixel
+  for (int y = (int)minY; y <= maxY; y++) {
+    for (int x = (int)minX; x <= maxX; x++) {
+
+      float px = x + 0.5; // Use center of the pixel
+      float py = y + 0.5;
+
+      // Calculate barycentric coordinates
+      float beta =
+          ((y3 - y1) * px + (x1 - x3) * py + x3 * y1 - x1 * y3) / f_ca_beta;
+      float gamma =
+          ((y1 - y2) * px + (x2 - x1) * py + x1 * y2 - x2 * y1) / f_ab_gamma;
+      float alpha = 1.0f - beta - gamma;
+
+      // Check if pixel is inside the triangle and all coordinates are within
+      // [0, 1]
+      if (alpha >= 0 && alpha <= 1 && beta >= 0 && beta <= 1 && gamma >= 0 &&
+          gamma <= 1) {
+        image_setColor(src, y, x, c); // Function to set the color of the pixel
       }
-      free(bary);
+      // printf("x: %d, y: %d, alpha: %f, beta: %f, gamma: %f\n", x, y, alpha,
+      // beta, gamma);
     }
   }
 }

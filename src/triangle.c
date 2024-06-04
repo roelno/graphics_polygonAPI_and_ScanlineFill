@@ -36,8 +36,9 @@ int main() {
   p = polygon_createp(3, pt);
 
   printf("drawing a triangle\n");
-  polygon_draw(p, src, Blue);
-  polygon_drawFill(p, src, Blue);
+  // polygon_draw(p, src, Blue);
+  // polygon_drawFill(p, src, Blue);
+  polygon_drawFillB(p, src, Red);
   image_write(src, "traingle.ppm");
 
   image_free(src);
