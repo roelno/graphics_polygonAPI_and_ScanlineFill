@@ -32,10 +32,10 @@ _DEPS = ppmIO.h image.h graphics.h polygon.h
 DEPS = $(patsubst %,$(INCDIR)/%,$(_DEPS))
 
 # put a list of the executables here
-EXECUTABLES = test4a triangle
+EXECUTABLES = test4a triangle test4b polyspeed test4c test4c-loop
 
 # put a list of all the object files here for all executables (with .o endings)
-_OBJ = test4a.o triangle.o
+_OBJ = test4a.o triangle.o test4b.o polyspeed.o test4c.o test4c-loop.o
 
 # convert them to point to the right place
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
@@ -60,6 +60,14 @@ all:
 test4a: $(ODIR)/test4a.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 triangle: $(ODIR)/triangle.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+test4b: $(ODIR)/test4b.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+polyspeed: $(ODIR)/polyspeed.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+test4c: $(ODIR)/test4c.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+test4c-loop: $(ODIR)/test4c-loop.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
 
