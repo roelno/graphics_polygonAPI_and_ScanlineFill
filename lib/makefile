@@ -6,7 +6,7 @@ CC = gcc
 INCDIR = ../include
 
 # set the flags for the C and C++ compiler to give lots of warnings
-CFLAGS = -I$(INCDIR) -I/opt/local/include -O2 -Wall -Wstrict-prototypes -Wnested-externs -Wmissing-prototypes -Wmissing-declarations
+CFLAGS = -I$(INCDIR) -I/opt/local/include -O2 -Wall -Wstrict-prototypes -Wnested-externs -Wmissing-prototypes -Wmissing-declarations -g
 CPPFLAGS = $(CFLAGS)
 
 # library tool defs

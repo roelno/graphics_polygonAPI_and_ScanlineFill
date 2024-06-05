@@ -45,7 +45,6 @@ void polygon_init(Polygon *p) {
   if (p != NULL) {
     p->oneSided = 0;
     p->nVertex = 0;
-    free(p->vertex);  // Free existing vertices if any
     p->vertex = NULL; // Set vertex pointer to NULL
   }
 }
